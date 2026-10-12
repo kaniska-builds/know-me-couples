@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Know Me 💗</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;font-family:Arial,sans-serif;
+ background:linear-gradient(135deg,#fff0f5,#f5eaff);
+ color:#48283c;min-height:100vh
+}
+header{text-align:center;padding:25px 12px 12px}
+header h1{color:#e84c91;margin:5px;font-size:30px}
+header p{color:#81536d}
+main{max-width:520px;margin:auto;padding:12px}
+.card{
+ background:#ffffffdd;border:1px solid #ffd2e6;
+ border-radius:22px;padding:20px;margin:14px 0;
+ box-shadow:0 8px 25px #c85a8517
+}
+h2{margin-top:0}
+button{
+ width:100%;padding:14px;margin:7px 0;border:0;
+ border-radius:13px;background:#ed5b9a;color:white;
+ font-size:16px;font-weight:bold;cursor:pointer
+}
+button.secondary{background:#fce0ed;color:#853d64}
+button.answer{background:#fff0f6;color:#66334f;border:1px solid #ffc5df}
+button.answer:hover{background:#ffd8e9}
+button:disabled{opacity:.7}
+.small{font-size:13px;color:#875c74;line-height:1.6}
+#game,#result{display:none}
+#progress{height:8px;background:#f9d8e7;border-radius:8px;overflow:hidden}
+#bar{height:100%;width:0;background:#e84c91;transition:width .2s}
+#answers{margin-top:14px}
+#feedback{font-weight:bold;min-height:24px}
+.heart{text-align:center;font-size:26px}
+</style>
+</head>
+<body>
+<header>
+ <div class="heart">💗 💞 💗</div>
+ <h1>Know Me</h1>
+ <p>A little game for two hearts ♡</p>
+</header>
+
+<main>
+ <section class="card" id="home">
+  <h2>💕 Welcome, Love!</h2>
+  <p>କେତେ ଭଲ ଭାବରେ ତୁମେ ତୁମ ପ୍ରିୟ ମଣିଷକୁ ଜାଣିଛ?</p>
+  <p class="small">Find out how well you know your favourite person!</p>
+  <button onclick="startQuiz()">Play Solo 💖</button>
+  <button class="secondary" onclick="alert('Private rooms and video calling will be connected in a later step. They are not active yet.')">Private Room + Video 📹</button>
+  <p class="small">🔒 Private-room and video-call features are not connected yet.</p>
+ </section>
+
+ <section class="card" id="game">
+  <p id="number" class="small"></p>
+  <div id="progress"><div id="bar"></div></div>
+  <h2 id="question"></h2>
+  <div id="answers"></div>
+  <p id="feedback"></p>
+  <button id="next" onclick="nextQuestion()" style="display:none">Next Question ➜</button>
+ </section>
+
+ <section class="card" id="result">
+  <div class="heart">💗</div>
+  <h2>Your Result</h2>
+  <h1 id="score"></h1>
+  <p id="title"></p>
+  <button onclick="startQuiz()">Play Again 🔄</button>
+  <button class="secondary" onclick="location.reload()">Home 🏠</button>
+ </section>
+
+ <section class="card">
+  <h2>💌 About this game</h2>
+  <p class="small">Romantic, funny, deep and tricky questions are mixed together randomly. More questions will be added as we build the game.</p>
+ </section>
+</main>
+
+<script>
+const questions = [
+ {q:"ତୁମର ପ୍ରିୟ ରଙ୍ଗ କ'ଣ?",a:["ନୀଳ","କଳା","ଗୋଲାପୀ","ସବୁଜ"],c:1},
+ {q:"ତୁମେ ଖାଲି ସମୟରେ କ'ଣ କରିବାକୁ ଭଲ ପାଅ?",a:["ଗୀତ ଶୁଣିବା","ସିନେମା ଦେଖିବା","ଶୋଇବା","ବୁଲିବା"],c:0},
+ {q:"ତୁମକୁ ସବୁଠାରୁ ଅଧିକ ଖୁସି କିଏ କରେ?",a:["ସାଙ୍ଗ","ପରିବାର","ପ୍ରିୟ ମଣିଷ","ନିଜେ"],c:2},
+ {q:"ତୁମର ପ୍ରିୟ ଖାଦ୍ୟ କ'ଣ?",a:["ପିଜ୍ଜା","ବିରିୟାନି","ଦୋସା","ଆଇସକ୍ରିମ୍"],c:1},
+ {q:"ତୁମେ ରାଗିଗଲେ କ'ଣ ପସନ୍ଦ କର?",a:["କିଛି ସମୟ ଏକା ରହିବା","କଥା ହେବା","ହସିବା","ବାହାରକୁ ଯିବା"],c:0},
+ {q:"ତୁମର ସ୍ୱପ୍ନର ଭ୍ରମଣ ସ୍ଥାନ କେଉଁଟି?",a:["ସମୁଦ୍ର କୂଳ","ପାହାଡ଼","ବିଦେଶ","ଜଙ୍ଗଲ"],c:0},
+ {q:"ତୁମେ କେଉଁ ଉପହାରକୁ ଅଧିକ ପସନ୍ଦ କର?",a:["ଚିଠି","ଫୁଲ","ଚକୋଲେଟ୍","ସରପ୍ରାଇଜ୍"],c:3},
+ {q:"ତୁମ ପାଇଁ ସମ୍ପର୍କରେ ସବୁଠାରୁ ଜରୁରୀ କ'ଣ?",a:["ବିଶ୍ୱାସ","ଟଙ୍କା","ଲୋକଦେଖାଣିଆ","ପ୍ରତିଯୋଗିତା"],c:0},
+ {q:"ତୁମେ କେଉଁ ସମୟକୁ ଅଧିକ ପସନ୍ଦ କର?",a:["ସକାଳ","ଦିନ","ସନ୍ଧ୍ୟା","ରାତି"],c:3},
+ {q:"ତୁମକୁ କିଏ ହସାଇବାରେ ସବୁଠାରୁ ଭଲ?",a:["ମୋ ସାଙ୍ଗ","ମୋ ଭାଇ/ଭଉଣୀ","ମୋ ପ୍ରିୟ ମଣିଷ","ମୋ ନିଜ ମଜା"],c:2}
+];
+
+let round=[],index=0,score=0,locked=false;
+
+function startQuiz(){
+ round=[...questions].sort(()=>Math.random()-.5);
+ index=0;score=0;
+ document.getElementById('home').style.display='none';
+ document.getElementById('result').style.display='none';
+ document.getElementById('game').style.display='block';
+ showQuestion();
+}
+function showQuestion(){
+ locked=false;
+ const item=round[index];
+ document.getElementById('number').textContent=
+  `ପ୍ରଶ୍ନ ${index+1} / ${round.length}`;
+ document.getElementById('bar').style.width=
+  `${index/round.length*100}%`;
+ document.getElementById('question').textContent=item.q;
+ document.getElementById('feedback').textContent='';
+ document.getElementById('next').style.display='none';
+ const box=document.getElementById('answers');
+ box.innerHTML='';
+ item.a.forEach((answer,i)=>{
+  const b=document.createElement('button');
+  b.className='answer';
+  b.textContent=answer;
+  b.onclick=()=>chooseAnswer(i,b);
+  box.appendChild(b);
+ });
+}
+function chooseAnswer(choice,button){
+ if(locked)return;
+ locked=true;
+ const item=round[index];
+ document.querySelectorAll('.answer').forEach(b=>b.disabled=true);
+ if(choice===item.c){
+  score++;
+  document.getElementById('feedback').textContent='ଠିକ୍ ଉତ୍ତର! 💖';
+ }else{
+  document.getElementById('feedback').textContent=
+   'ଠିକ୍ ଉତ୍ତର: '+item.a[item.c];
+ }
+ document.getElementById('bar').style.width=
+  `${(index+1)/round.length*100}%`;
+ document.getElementById('next').style.display='block';
+ document.getElementById('next').textContent=
+  index===round.length-1?'See Result 💗':'Next Question ➜';
+}
+function nextQuestion(){
+ index++;
+ if(index<round.length){showQuestion();return;}
+ document.getElementById('game').style.display='none';
+ document.getElementById('result').style.display='block';
+ const percent=Math.round(score/round.length*100);
+ document.getElementById('score').textContent=
+  `${score} / ${round.length} (${percent}%)`;
+ document.getElementById('title').textContent=
+  percent>=80?'ତୁମେ ଜଣେ ସୁପରଷ୍ଟାର! 💖':
+  percent>=50?'ତୁମେ ଭଲ ଜାଣିଛ! 💕':
+  'ଆହୁରି ପରସ୍ପରକୁ ଜାଣିବାର ସମୟ! 💌';
+}
+</script>
+</body>
+</html>
