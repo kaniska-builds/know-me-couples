@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fff0f7">
 <title>Know Me Couples 💗</title>
 <style>
 :root{--pink:#ec4899;--dark:#592747;--pale:#fff0f7}
@@ -19,18 +20,20 @@ button,input{font:inherit}
 button{border:0;border-radius:13px;padding:13px;width:100%;margin:6px 0;background:var(--pink);color:white;font-weight:bold;cursor:pointer}
 .secondary{background:#fce1ee;color:#84345f}
 .answer{background:#fff1f7;color:#632e4d;border:1px solid #ffc9e1;text-align:left}
-button:disabled{opacity:.7}
+.answer.selected{background:#ec4899;color:white}
+button:disabled{opacity:.7;cursor:default}
 input{width:100%;padding:12px;border:1px solid #e8b8d0;border-radius:12px;margin:6px 0}
 .small{font-size:13px;line-height:1.6;color:#88637a}
 .center{text-align:center}
 .heart{font-size:28px}
 #game,#result,#leaderboard{display:none}
 #progress{height:8px;background:#f8d5e5;border-radius:8px;overflow:hidden;margin:12px 0}
-#bar{height:100%;width:0;background:var(--pink)}
+#bar{height:100%;width:0;background:var(--pink);transition:width .2s}
 .rank{display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;margin:8px 0;background:#fff0c9}
-.rank:nth-child(3){background:#f0eafa}
+.rank:nth-child(2){background:#f0eafa}
 .rank .name{flex:1;overflow-wrap:anywhere}
 .score{font-weight:bold}
+.status{padding:10px;border-radius:12px;background:#fff1f7;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -39,15 +42,17 @@ input{width:100%;padding:12px;border:1px solid #e8b8d0;border-radius:12px;margin
  <h1>Know Me Couples</h1>
  <p>ଦେଖ, ତୁମେ ତୁମ ପ୍ରିୟ ମଣିଷକୁ କେତେ ଜାଣିଛ! 💕</p>
 </header>
+
 <main>
 <section class="card" id="home">
  <h2>💕 ଖେଳ ଆରମ୍ଭ କର</h2>
  <p>ତୁମର ନାମ କିମ୍ବା ଦୁହିଁଙ୍କର ଏକ ସୁନ୍ଦର ନାମ ଲେଖ।</p>
  <input id="coupleName" maxlength="30" placeholder="ଯେପରି: Love Birds 💗">
- <button onclick="startQuiz()">ଖେଳ ଆରମ୍ଭ 💖</button>
+ <button id="startBtn" onclick="startQuiz()">ଖେଳ ଆରମ୍ଭ 💖</button>
  <button class="secondary" onclick="showBoard()">🏆 ଶ୍ରେଷ୍ଠ ୨ ଯୋଡ଼ି</button>
- <p class="small">ଏହି ଭର୍ସନରେ ସ୍କୋର କେବଳ ଏହି ଡିଭାଇସ୍‌ରେ ସେଭ୍ ହୁଏ। ଏହା ଏପର୍ଯ୍ୟନ୍ତ ଲାଇଭ୍ ଅନଲାଇନ୍ ଲିଡରବୋର୍ଡ ନୁହେଁ।</p>
+ <p class="small">ପ୍ରଶ୍ନ ଓ ସ୍କୋର Supabase ସର୍ଭର ସହ ଯୋଡ଼ାଯାଇଛି। ଅନଲାଇନ୍ ଲିଡରବୋର୍ଡ ଦେଖିବା ପାଇଁ ଇଣ୍ଟରନେଟ୍ ଆବଶ୍ୟକ।</p>
  <button class="secondary" onclick="alert('ପ୍ରାଇଭେଟ୍ ରୁମ୍ ଓ ଭିଡିଓ କଲ୍ ପରବର୍ତ୍ତୀ ପଦକ୍ଷେପରେ ଯୋଡ଼ାଯିବ।')">🔐 ପ୍ରାଇଭେଟ୍ ରୁମ୍ + ଭିଡିଓ କଲ୍</button>
+ <p id="homeStatus" class="small" role="status"></p>
 </section>
 
 <section class="card" id="game">
@@ -55,8 +60,9 @@ input{width:100%;padding:12px;border:1px solid #e8b8d0;border-radius:12px;margin
  <div id="progress"><div id="bar"></div></div>
  <h2 id="question"></h2>
  <div id="answers"></div>
- <p id="feedback"></p>
+ <p id="feedback" role="status"></p>
  <button id="next" style="display:none" onclick="nextQuestion()">ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜</button>
+ <button class="secondary" onclick="goHome()">ଖେଳ ଛାଡ଼</button>
 </section>
 
 <section class="card center" id="result">
@@ -64,16 +70,18 @@ input{width:100%;padding:12px;border:1px solid #e8b8d0;border-radius:12px;margin
  <h2>ତୁମର ଫଳାଫଳ</h2>
  <h1 id="finalScore"></h1>
  <p id="finalTitle"></p>
- <button onclick="saveScore()">🏆 ଲିଡରବୋର୍ଡରେ ସ୍କୋର ସେଭ୍ କର</button>
+ <p id="resultStatus" class="small"></p>
+ <button onclick="showBoard()">🏆 ଅନଲାଇନ୍ ଲିଡରବୋର୍ଡ ଦେଖ</button>
  <button class="secondary" onclick="startQuiz()">ପୁଣି ଖେଳ 🔄</button>
  <button class="secondary" onclick="goHome()">ହୋମ୍ 🏠</button>
 </section>
 
 <section class="card" id="leaderboard">
  <h2 class="center">🏆 ଶ୍ରେଷ୍ଠ ୨ ଯୋଡ଼ି</h2>
- <p class="small center">ଏହି ଡିଭାଇସ୍‌ରେ ସେଭ୍ ହୋଇଥିବା ସ୍କୋର</p>
+ <p class="small center">ସର୍ଭରରେ ସେଭ୍ ହୋଇଥିବା ସ୍କୋର</p>
+ <p id="boardStatus" class="small center" role="status"></p>
  <div id="boardRows"></div>
- <p id="emptyBoard" class="small center">ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ସ୍କୋର ନାହିଁ। ଖେଳ ଆରମ୍ଭ କର!</p>
+ <p id="emptyBoard" class="small center">ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ସ୍କୋର ନାହିଁ।</p>
  <button onclick="goHome()">ଫେରିଯାଅ</button>
 </section>
 
@@ -82,92 +90,251 @@ input{width:100%;padding:12px;border:1px solid #e8b8d0;border-radius:12px;margin
  <p class="small">ପ୍ରେମ, ମଜା, ଭାବନା ଓ କଠିନ ପ୍ରଶ୍ନ ସବୁ ମିଶିକି ଆସିବ। ପ୍ରତିଥର ନୂଆ କ୍ରମରେ ପ୍ରଶ୍ନ ଆସିବ।</p>
 </section>
 </main>
-<script>
-const questions=[
-{q:"ତୁମର ପ୍ରିୟ ରଙ୍ଗ କ'ଣ?",a:["ନୀଳ","କଳା","ଗୋଲାପୀ","ସବୁଜ"],c:1},
-{q:"ତୁମେ ଖାଲି ସମୟରେ କ'ଣ କରିବାକୁ ଭଲ ପାଅ?",a:["ଗୀତ ଶୁଣିବା","ସିନେମା ଦେଖିବା","ଶୋଇବା","ବୁଲିବା"],c:0},
-{q:"ତୁମକୁ ସବୁଠାରୁ ଅଧିକ ଖୁସି କିଏ କରେ?",a:["ସାଙ୍ଗ","ପରିବାର","ପ୍ରିୟ ମଣିଷ","ନିଜେ"],c:2},
-{q:"ତୁମର ପ୍ରିୟ ଖାଦ୍ୟ କ'ଣ?",a:["ପିଜ୍ଜା","ବିରିୟାନି","ଦୋସା","ଆଇସକ୍ରିମ୍"],c:1},
-{q:"ତୁମେ ରାଗିଗଲେ କ'ଣ ପସନ୍ଦ କର?",a:["ଏକା ରହିବା","କଥା ହେବା","ହସିବା","ବୁଲିବା"],c:0},
-{q:"ତୁମର ସ୍ୱପ୍ନର ଭ୍ରମଣ ସ୍ଥାନ କେଉଁଟି?",a:["ସମୁଦ୍ର କୂଳ","ପାହାଡ଼","ବିଦେଶ","ଜଙ୍ଗଲ"],c:0},
-{q:"ତୁମେ କେଉଁ ଉପହାରକୁ ଅଧିକ ପସନ୍ଦ କର?",a:["ଚିଠି","ଫୁଲ","ଚକୋଲେଟ୍","ସରପ୍ରାଇଜ୍"],c:3},
-{q:"ତୁମ ପାଇଁ ସମ୍ପର୍କରେ ସବୁଠାରୁ ଜରୁରୀ କ'ଣ?",a:["ବିଶ୍ୱାସ","ଟଙ୍କା","ଦେଖାଣିଆ","ପ୍ରତିଯୋଗିତା"],c:0},
-{q:"ତୁମେ କେଉଁ ସମୟକୁ ଅଧିକ ପସନ୍ଦ କର?",a:["ସକାଳ","ଦିନ","ସନ୍ଧ୍ୟା","ରାତି"],c:3},
-{q:"ତୁମକୁ କିଏ ସବୁଠାରୁ ଅଧିକ ହସାଏ?",a:["ସାଙ୍ଗ","ଭାଇ/ଭଉଣୀ","ପ୍ରିୟ ମଣିଷ","ନିଜେ"],c:2},
-{q:"ତୁମର ପ୍ରିୟ ଋତୁ କେଉଁଟି?",a:["ଗ୍ରୀଷ୍ମ","ବର୍ଷା","ଶୀତ","ବସନ୍ତ"],c:2},
-{q:"ତୁମେ ଉପହାରରେ କ'ଣ ଅଧିକ ପସନ୍ଦ କର?",a:["ହାତରେ ତିଆରି ଜିନିଷ","ଦାମୀ ଜିନିଷ","ଚିଠି","ଯାତ୍ରା"],c:0},
-{q:"ତୁମେ ଦୁଃଖୀ ହେଲେ କ'ଣ ଚାହଁ?",a:["କେହି ଶୁଣନ୍ତୁ","ଏକା ରହିବା","ମଜା କଥା","ଶୋଇବା"],c:0},
-{q:"ତୁମ ପାଇଁ ପ୍ରେମର ଅର୍ଥ କ'ଣ?",a:["ବିଶ୍ୱାସ","କେବଳ ଉପହାର","ଦେଖାଣିଆ","ପ୍ରତିଯୋଗିତା"],c:0},
-{q:"ତୁମେ କେଉଁ ପାନୀୟ ପସନ୍ଦ କର?",a:["ଚା","କଫି","ଜୁସ୍","ପାଣି"],c:0},
-{q:"ତୁମେ ଛୁଟିଦିନରେ କ'ଣ କରିବାକୁ ଚାହଁ?",a:["ଘରେ ରହିବା","ବୁଲିବା","ସିନେମା","ସାଙ୍ଗଙ୍କ ସହ ସମୟ"],c:1},
-{q:"ତୁମର ସବୁଠାରୁ ବଡ଼ ଭୟ କ'ଣ?",a:["ହରାଇବା","ଅନ୍ଧାର","ଉଚ୍ଚତା","ଏକା ରହିବା"],c:0},
-{q:"ତୁମକୁ କେଉଁ ପ୍ରକାର ସନ୍ଦେଶ ଭଲ ଲାଗେ?",a:["ମଜାଳିଆ","ପ୍ରେମଭରା","ଲମ୍ବା","ଛୋଟ"],c:1},
-{q:"ତୁମେ କେଉଁ ପ୍ରକାର ସିନେମା ପସନ୍ଦ କର?",a:["କମେଡି","ରୋମାଣ୍ଟିକ୍","ହରର୍","ଆକ୍ସନ୍"],c:1},
-{q:"ତୁମେ କାହା ସହ ସମୟ ବିତାଇବାକୁ ଭଲ ପାଅ?",a:["ସାଙ୍ଗ","ପରିବାର","ପ୍ରିୟ ମଣିଷ","ଏକା"],c:2},
-{q:"ତୁମ ପାଇଁ ସବୁଠାରୁ ସୁନ୍ଦର ଜିନିଷ କ'ଣ?",a:["ପ୍ରକୃତି","ଟଙ୍କା","ପୋଷାକ","ଫୋନ୍"],c:0},
-{q:"ତୁମେ ଭୁଲ୍ କଲେ କ'ଣ ଆଶା କର?",a:["ବୁଝିବା","ଦଣ୍ଡ","ଅବହେଳା","ରାଗ"],c:0},
-{q:"ତୁମେ କେଉଁ ରଙ୍ଗର ପୋଷାକ ଅଧିକ ପିନ୍ଧ?",a:["କଳା","ଧଳା","ନୀଳ","ଯେକୌଣସି"],c:0},
-{q:"ତୁମର ସବୁଠାରୁ ପ୍ରିୟ ସ୍ମୃତି କେଉଁଟି?",a:["ପିଲାଦିନ","ସାଙ୍ଗଙ୍କ ସହ","ପରିବାର ସହ","ପ୍ରେମର ସ୍ମୃତି"],c:3},
-{q:"ତୁମେ କାହାକୁ କ୍ଷମା କରିବାକୁ କ'ଣ ଦରକାର ମନେ କର?",a:["ସତ୍ୟ କଥା","ଉପହାର","ସମୟ","କିଛି ନୁହେଁ"],c:0}
-];
 
-let round=[],index=0,score=0,locked=false,currentName="Love Birds";
-function el(id){return document.getElementById(id)}
-function hideAll(){["home","game","result","leaderboard"].forEach(id=>el(id).style.display="none")}
-function goHome(){hideAll();el("home").style.display="block"}
-function startQuiz(){
- currentName=el("coupleName").value.trim()||"Love Birds";
- round=[...questions].sort(()=>Math.random()-.5);
- index=0;score=0;hideAll();el("game").style.display="block";showQuestion()
+<script>
+/*
+  Supabase project settings:
+  URL and publishable key below are for your project.
+  Never put a sb_secret_ or service_role key in this file.
+*/
+const SUPABASE_URL = "https://susvamdefjbubpltxrzm.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Jjw14Tc2gvMPMICJzKz-QA_Y-UJD6p";
+const FUNCTION_URL = SUPABASE_URL + "/functions/v1/hyper-function";
+
+let round = [];
+let index = 0;
+let answers = [];
+let sessionId = "";
+let currentName = "Love Birds";
+let locked = false;
+let submitting = false;
+let lastResult = null;
+
+function el(id) {
+  return document.getElementById(id);
 }
-function showQuestion(){
- locked=false;let item=round[index];
- el("number").textContent=`ପ୍ରଶ୍ନ ${index+1} / ${round.length}`;
- el("bar").style.width=`${index/round.length*100}%`;
- el("question").textContent=item.q;el("feedback").textContent="";
- el("next").style.display="none";el("next").textContent="ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜";
- el("answers").innerHTML="";
- item.a.forEach((answer,i)=>{
-  let b=document.createElement("button");b.className="answer";b.textContent=answer;
-  b.onclick=()=>chooseAnswer(i);el("answers").appendChild(b)
- })
+
+function hideAll() {
+  ["home", "game", "result", "leaderboard"].forEach(id => {
+    el(id).style.display = "none";
+  });
 }
-function chooseAnswer(choice){
- if(locked)return;locked=true;let item=round[index];
- document.querySelectorAll(".answer").forEach(b=>b.disabled=true);
- if(choice===item.c){score++;el("feedback").textContent="ଠିକ୍ ଉତ୍ତର! 💖"}
- else{el("feedback").textContent="ଠିକ୍ ଉତ୍ତର: "+item.a[item.c]}
- el("bar").style.width=`${(index+1)/round.length*100}%`;
- el("next").style.display="block";
- el("next").textContent=index===round.length-1?"ଫଳାଫଳ ଦେଖ 💗":"ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜"
+
+function goHome() {
+  hideAll();
+  el("home").style.display = "block";
 }
-function nextQuestion(){
- index++;if(index<round.length){showQuestion();return}
- hideAll();el("result").style.display="block";
- let percent=Math.round(score/round.length*100);
- el("finalScore").textContent=`${score} / ${round.length} (${percent}%)`;
- el("finalTitle").textContent=percent>=80?"ତୁମେ ଜଣେ ସୁପରଷ୍ଟାର! 💖":percent>=50?"ତୁମେ ଭଲ ଜାଣିଛ! 💕":"ଆହୁରି ପରସ୍ପରକୁ ଜାଣିବାର ସମୟ! 💌"
+
+async function api(action, extra = {}) {
+  const response = await fetch(FUNCTION_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_PUBLISHABLE_KEY
+    },
+    body: JSON.stringify({ action, ...extra })
+  });
+
+  const text = await response.text();
+  let data;
+
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error("ସର୍ଭରରୁ ଠିକ୍ ଉତ୍ତର ମିଳିଲା ନାହିଁ।");
+  }
+
+  if (!response.ok) {
+    throw new Error(data.error || data.message || "Request failed (" + response.status + ")");
+  }
+
+  if (data.error) {
+    throw new Error(data.error);
+  }
+
+  return data;
 }
-function getScores(){try{return JSON.parse(localStorage.getItem("knowMeScores")||"[]")}catch(e){return []}}
-function saveScore(){
- let scores=getScores();
- scores.push({name:currentName,score:score,total:round.length,percent:Math.round(score/round.length*100),date:Date.now()});
- scores.sort((a,b)=>b.percent-a.percent||b.score-a.score||a.date-b.date);
- localStorage.setItem("knowMeScores",JSON.stringify(scores.slice(0,50)));
- showBoard()
+
+function shuffleLocal(items) {
+  return [...items].sort(() => Math.random() - 0.5);
 }
-function showBoard(){
- hideAll();el("leaderboard").style.display="block";
- let scores=getScores().sort((a,b)=>b.percent-a.percent||b.score-a.score||a.date-b.date).slice(0,2);
- el("boardRows").innerHTML="";
- el("emptyBoard").style.display=scores.length?"none":"block";
- scores.forEach((s,i)=>{
-  let row=document.createElement("div");row.className="rank";
-  let medal=document.createElement("span");medal.textContent=i===0?"🥇":"🥈";
-  let name=document.createElement("span");name.className="name";name.textContent=s.name;
-  let points=document.createElement("span");points.className="score";points.textContent=s.percent+"%";
-  row.append(medal,name,points);el("boardRows").appendChild(row)
- })
+
+async function startQuiz() {
+  const btn = el("startBtn");
+  currentName = el("coupleName").value.trim() || "Love Birds";
+
+  if (currentName.length > 30) {
+    el("homeStatus").textContent = "ଦୟାକରି ୩୦ ଅକ୍ଷର ମଧ୍ୟରେ ନାମ ଲେଖ।";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "ଲୋଡ୍ ହେଉଛି... 💗";
+  el("homeStatus").textContent = "ସର୍ଭରରୁ ପ୍ରଶ୍ନ ଆସୁଛି...";
+
+  try {
+    const data = await api("start");
+
+    if (!data.session_id || !Array.isArray(data.questions) || data.questions.length === 0) {
+      throw new Error("ପ୍ରଶ୍ନ ମିଳିଲା ନାହିଁ। Supabase ରେ ପ୍ରଶ୍ନ ଯୋଡ଼।");
+    }
+
+    sessionId = data.session_id;
+    round = data.questions;
+    answers = [];
+    index = 0;
+    locked = false;
+    submitting = false;
+    lastResult = null;
+
+    hideAll();
+    el("game").style.display = "block";
+    showQuestion();
+  } catch (error) {
+    el("homeStatus").textContent =
+      "ତ୍ରୁଟି: " + error.message + " | ଇଣ୍ଟରନେଟ୍ ଓ Supabase function ଯାଞ୍ଚ କର।";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "ଖେଳ ଆରମ୍ଭ 💖";
+  }
+}
+
+function showQuestion() {
+  locked = false;
+  const item = round[index];
+
+  el("number").textContent = `ପ୍ରଶ୍ନ ${index + 1} / ${round.length}`;
+  el("bar").style.width = `${index / round.length * 100}%`;
+  el("question").textContent = item.question;
+  el("feedback").textContent = "ଏକ ଉତ୍ତର ବାଛ।";
+  el("next").style.display = "none";
+  el("next").disabled = false;
+  el("answers").innerHTML = "";
+
+  item.options.forEach((option, i) => {
+    const button = document.createElement("button");
+    button.className = "answer";
+    button.textContent = option;
+    button.onclick = () => chooseAnswer(i);
+    el("answers").appendChild(button);
+  });
+}
+
+function chooseAnswer(choice) {
+  if (locked || submitting) return;
+
+  locked = true;
+  answers[index] = choice;
+
+  document.querySelectorAll(".answer").forEach((button, i) => {
+    button.disabled = true;
+    if (i === choice) button.classList.add("selected");
+  });
+
+  el("feedback").textContent = "ଉତ୍ତର ସେଭ୍ ହେଲା 💗";
+  el("bar").style.width = `${(index + 1) / round.length * 100}%`;
+  el("next").textContent =
+    index === round.length - 1 ? "ଫଳାଫଳ ଦେଖ 💗" : "ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜";
+  el("next").style.display = "block";
+}
+
+async function nextQuestion() {
+  if (!locked || submitting) return;
+
+  index++;
+
+  if (index < round.length) {
+    showQuestion();
+    return;
+  }
+
+  await submitScore();
+}
+
+async function submitScore() {
+  submitting = true;
+  el("next").disabled = true;
+  el("feedback").textContent = "ସର୍ଭରରେ ସ୍କୋର ଯାଞ୍ଚ ହେଉଛି... 💗";
+
+  try {
+    const data = await api("submit", {
+      session_id: sessionId,
+      couple_name: currentName,
+      answers
+    });
+
+    lastResult = data;
+    hideAll();
+    el("result").style.display = "block";
+
+    const score = Number(data.score);
+    const total = Number(data.total_questions);
+    const percent = Number(data.percentage);
+
+    el("finalScore").textContent = `${score} / ${total} (${percent}%)`;
+    el("finalTitle").textContent =
+      percent >= 80 ? "ତୁମେ ଜଣେ ସୁପରଷ୍ଟାର! 💖" :
+      percent >= 50 ? "ତୁମେ ଭଲ ଜାଣିଛ! 💕" :
+      "ଆହୁରି ପରସ୍ପରକୁ ଜାଣିବାର ସମୟ! 💌";
+
+    el("resultStatus").textContent =
+      "ସ୍କୋର ସର୍ଭରରେ ଯାଞ୍ଚ ହୋଇଛି। ଲିଡରବୋର୍ଡ ଦେଖିବା ପାଇଁ ତଳର ବଟନ୍ ଦବାଅ।";
+  } catch (error) {
+    el("feedback").textContent = "ସ୍କୋର ସେଭ୍ ହୋଇନାହିଁ: " + error.message;
+    el("next").disabled = false;
+    el("next").textContent = "ପୁଣି ଚେଷ୍ଟା କର";
+    index = round.length - 1;
+    submitting = false;
+    return;
+  }
+
+  submitting = false;
+}
+
+async function showBoard() {
+  hideAll();
+  el("leaderboard").style.display = "block";
+  el("boardRows").innerHTML = "";
+  el("emptyBoard").style.display = "none";
+  el("boardStatus").textContent = "ଲିଡରବୋର୍ଡ ଲୋଡ୍ ହେଉଛି...";
+
+  try {
+    const data = await api("leaderboard");
+    const rows = Array.isArray(data)
+      ? data
+      : (data.leaderboard || data.scores || data.data || []);
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      el("boardStatus").textContent = "";
+      el("emptyBoard").style.display = "block";
+      return;
+    }
+
+    el("boardStatus").textContent = "";
+
+    rows.slice(0, 2).forEach((item, i) => {
+      const row = document.createElement("div");
+      row.className = "rank";
+
+      const medal = document.createElement("span");
+      medal.textContent = i === 0 ? "🥇" : "🥈";
+
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = item.couple_name || item.name || "Love Birds";
+
+      const points = document.createElement("span");
+      points.className = "score";
+      points.textContent = Number(item.percentage ?? item.percent ?? 0) + "%";
+
+      row.append(medal, name, points);
+      el("boardRows").appendChild(row);
+    });
+  } catch (error) {
+    el("boardStatus").textContent =
+      "ଲିଡରବୋର୍ଡ ଲୋଡ୍ ହୋଇନାହିଁ: " + error.message;
+    el("emptyBoard").style.display = "block";
+  }
 }
 </script>
 </body>
