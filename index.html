@@ -1,160 +1,173 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="or">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Know Me 💗</title>
+<title>Know Me Couples 💗</title>
 <style>
+:root{--pink:#ec4899;--dark:#592747;--pale:#fff0f7}
 *{box-sizing:border-box}
-body{
- margin:0;font-family:Arial,sans-serif;
- background:linear-gradient(135deg,#fff0f5,#f5eaff);
- color:#48283c;min-height:100vh
-}
+body{margin:0;font-family:Arial,sans-serif;color:var(--dark);background:linear-gradient(140deg,#fff0f5,#f1e8ff);min-height:100vh}
 header{text-align:center;padding:25px 12px 12px}
-header h1{color:#e84c91;margin:5px;font-size:30px}
-header p{color:#81536d}
-main{max-width:520px;margin:auto;padding:12px}
-.card{
- background:#ffffffdd;border:1px solid #ffd2e6;
- border-radius:22px;padding:20px;margin:14px 0;
- box-shadow:0 8px 25px #c85a8517
-}
+header h1{font-size:32px;color:var(--pink);margin:8px 0}
+header p{margin:6px}
+main{max-width:560px;margin:auto;padding:12px}
+.card{background:#ffffffed;border:1px solid #ffd1e5;border-radius:22px;padding:20px;margin:14px 0;box-shadow:0 8px 25px #b7477510}
 h2{margin-top:0}
-button{
- width:100%;padding:14px;margin:7px 0;border:0;
- border-radius:13px;background:#ed5b9a;color:white;
- font-size:16px;font-weight:bold;cursor:pointer
-}
-button.secondary{background:#fce0ed;color:#853d64}
-button.answer{background:#fff0f6;color:#66334f;border:1px solid #ffc5df}
-button.answer:hover{background:#ffd8e9}
+button,input{font:inherit}
+button{border:0;border-radius:13px;padding:13px;width:100%;margin:6px 0;background:var(--pink);color:white;font-weight:bold;cursor:pointer}
+.secondary{background:#fce1ee;color:#84345f}
+.answer{background:#fff1f7;color:#632e4d;border:1px solid #ffc9e1;text-align:left}
 button:disabled{opacity:.7}
-.small{font-size:13px;color:#875c74;line-height:1.6}
-#game,#result{display:none}
-#progress{height:8px;background:#f9d8e7;border-radius:8px;overflow:hidden}
-#bar{height:100%;width:0;background:#e84c91;transition:width .2s}
-#answers{margin-top:14px}
-#feedback{font-weight:bold;min-height:24px}
-.heart{text-align:center;font-size:26px}
+input{width:100%;padding:12px;border:1px solid #e8b8d0;border-radius:12px;margin:6px 0}
+.small{font-size:13px;line-height:1.6;color:#88637a}
+.center{text-align:center}
+.heart{font-size:28px}
+#game,#result,#leaderboard{display:none}
+#progress{height:8px;background:#f8d5e5;border-radius:8px;overflow:hidden;margin:12px 0}
+#bar{height:100%;width:0;background:var(--pink)}
+.rank{display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;margin:8px 0;background:#fff0c9}
+.rank:nth-child(3){background:#f0eafa}
+.rank .name{flex:1;overflow-wrap:anywhere}
+.score{font-weight:bold}
 </style>
 </head>
 <body>
 <header>
  <div class="heart">💗 💞 💗</div>
- <h1>Know Me</h1>
- <p>A little game for two hearts ♡</p>
+ <h1>Know Me Couples</h1>
+ <p>ଦେଖ, ତୁମେ ତୁମ ପ୍ରିୟ ମଣିଷକୁ କେତେ ଜାଣିଛ! 💕</p>
 </header>
-
 <main>
- <section class="card" id="home">
-  <h2>💕 Welcome, Love!</h2>
-  <p>କେତେ ଭଲ ଭାବରେ ତୁମେ ତୁମ ପ୍ରିୟ ମଣିଷକୁ ଜାଣିଛ?</p>
-  <p class="small">Find out how well you know your favourite person!</p>
-  <button onclick="startQuiz()">Play Solo 💖</button>
-  <button class="secondary" onclick="alert('Private rooms and video calling will be connected in a later step. They are not active yet.')">Private Room + Video 📹</button>
-  <p class="small">🔒 Private-room and video-call features are not connected yet.</p>
- </section>
+<section class="card" id="home">
+ <h2>💕 ଖେଳ ଆରମ୍ଭ କର</h2>
+ <p>ତୁମର ନାମ କିମ୍ବା ଦୁହିଁଙ୍କର ଏକ ସୁନ୍ଦର ନାମ ଲେଖ।</p>
+ <input id="coupleName" maxlength="30" placeholder="ଯେପରି: Love Birds 💗">
+ <button onclick="startQuiz()">ଖେଳ ଆରମ୍ଭ 💖</button>
+ <button class="secondary" onclick="showBoard()">🏆 ଶ୍ରେଷ୍ଠ ୨ ଯୋଡ଼ି</button>
+ <p class="small">ଏହି ଭର୍ସନରେ ସ୍କୋର କେବଳ ଏହି ଡିଭାଇସ୍‌ରେ ସେଭ୍ ହୁଏ। ଏହା ଏପର୍ଯ୍ୟନ୍ତ ଲାଇଭ୍ ଅନଲାଇନ୍ ଲିଡରବୋର୍ଡ ନୁହେଁ।</p>
+ <button class="secondary" onclick="alert('ପ୍ରାଇଭେଟ୍ ରୁମ୍ ଓ ଭିଡିଓ କଲ୍ ପରବର୍ତ୍ତୀ ପଦକ୍ଷେପରେ ଯୋଡ଼ାଯିବ।')">🔐 ପ୍ରାଇଭେଟ୍ ରୁମ୍ + ଭିଡିଓ କଲ୍</button>
+</section>
 
- <section class="card" id="game">
-  <p id="number" class="small"></p>
-  <div id="progress"><div id="bar"></div></div>
-  <h2 id="question"></h2>
-  <div id="answers"></div>
-  <p id="feedback"></p>
-  <button id="next" onclick="nextQuestion()" style="display:none">Next Question ➜</button>
- </section>
+<section class="card" id="game">
+ <p id="number" class="small"></p>
+ <div id="progress"><div id="bar"></div></div>
+ <h2 id="question"></h2>
+ <div id="answers"></div>
+ <p id="feedback"></p>
+ <button id="next" style="display:none" onclick="nextQuestion()">ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜</button>
+</section>
 
- <section class="card" id="result">
-  <div class="heart">💗</div>
-  <h2>Your Result</h2>
-  <h1 id="score"></h1>
-  <p id="title"></p>
-  <button onclick="startQuiz()">Play Again 🔄</button>
-  <button class="secondary" onclick="location.reload()">Home 🏠</button>
- </section>
+<section class="card center" id="result">
+ <div class="heart">💗</div>
+ <h2>ତୁମର ଫଳାଫଳ</h2>
+ <h1 id="finalScore"></h1>
+ <p id="finalTitle"></p>
+ <button onclick="saveScore()">🏆 ଲିଡରବୋର୍ଡରେ ସ୍କୋର ସେଭ୍ କର</button>
+ <button class="secondary" onclick="startQuiz()">ପୁଣି ଖେଳ 🔄</button>
+ <button class="secondary" onclick="goHome()">ହୋମ୍ 🏠</button>
+</section>
 
- <section class="card">
-  <h2>💌 About this game</h2>
-  <p class="small">Romantic, funny, deep and tricky questions are mixed together randomly. More questions will be added as we build the game.</p>
- </section>
+<section class="card" id="leaderboard">
+ <h2 class="center">🏆 ଶ୍ରେଷ୍ଠ ୨ ଯୋଡ଼ି</h2>
+ <p class="small center">ଏହି ଡିଭାଇସ୍‌ରେ ସେଭ୍ ହୋଇଥିବା ସ୍କୋର</p>
+ <div id="boardRows"></div>
+ <p id="emptyBoard" class="small center">ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ସ୍କୋର ନାହିଁ। ଖେଳ ଆରମ୍ଭ କର!</p>
+ <button onclick="goHome()">ଫେରିଯାଅ</button>
+</section>
+
+<section class="card">
+ <h2>💌 ଏହି ଖେଳ ବିଷୟରେ</h2>
+ <p class="small">ପ୍ରେମ, ମଜା, ଭାବନା ଓ କଠିନ ପ୍ରଶ୍ନ ସବୁ ମିଶିକି ଆସିବ। ପ୍ରତିଥର ନୂଆ କ୍ରମରେ ପ୍ରଶ୍ନ ଆସିବ।</p>
+</section>
 </main>
-
 <script>
-const questions = [
- {q:"ତୁମର ପ୍ରିୟ ରଙ୍ଗ କ'ଣ?",a:["ନୀଳ","କଳା","ଗୋଲାପୀ","ସବୁଜ"],c:1},
- {q:"ତୁମେ ଖାଲି ସମୟରେ କ'ଣ କରିବାକୁ ଭଲ ପାଅ?",a:["ଗୀତ ଶୁଣିବା","ସିନେମା ଦେଖିବା","ଶୋଇବା","ବୁଲିବା"],c:0},
- {q:"ତୁମକୁ ସବୁଠାରୁ ଅଧିକ ଖୁସି କିଏ କରେ?",a:["ସାଙ୍ଗ","ପରିବାର","ପ୍ରିୟ ମଣିଷ","ନିଜେ"],c:2},
- {q:"ତୁମର ପ୍ରିୟ ଖାଦ୍ୟ କ'ଣ?",a:["ପିଜ୍ଜା","ବିରିୟାନି","ଦୋସା","ଆଇସକ୍ରିମ୍"],c:1},
- {q:"ତୁମେ ରାଗିଗଲେ କ'ଣ ପସନ୍ଦ କର?",a:["କିଛି ସମୟ ଏକା ରହିବା","କଥା ହେବା","ହସିବା","ବାହାରକୁ ଯିବା"],c:0},
- {q:"ତୁମର ସ୍ୱପ୍ନର ଭ୍ରମଣ ସ୍ଥାନ କେଉଁଟି?",a:["ସମୁଦ୍ର କୂଳ","ପାହାଡ଼","ବିଦେଶ","ଜଙ୍ଗଲ"],c:0},
- {q:"ତୁମେ କେଉଁ ଉପହାରକୁ ଅଧିକ ପସନ୍ଦ କର?",a:["ଚିଠି","ଫୁଲ","ଚକୋଲେଟ୍","ସରପ୍ରାଇଜ୍"],c:3},
- {q:"ତୁମ ପାଇଁ ସମ୍ପର୍କରେ ସବୁଠାରୁ ଜରୁରୀ କ'ଣ?",a:["ବିଶ୍ୱାସ","ଟଙ୍କା","ଲୋକଦେଖାଣିଆ","ପ୍ରତିଯୋଗିତା"],c:0},
- {q:"ତୁମେ କେଉଁ ସମୟକୁ ଅଧିକ ପସନ୍ଦ କର?",a:["ସକାଳ","ଦିନ","ସନ୍ଧ୍ୟା","ରାତି"],c:3},
- {q:"ତୁମକୁ କିଏ ହସାଇବାରେ ସବୁଠାରୁ ଭଲ?",a:["ମୋ ସାଙ୍ଗ","ମୋ ଭାଇ/ଭଉଣୀ","ମୋ ପ୍ରିୟ ମଣିଷ","ମୋ ନିଜ ମଜା"],c:2}
+const questions=[
+{q:"ତୁମର ପ୍ରିୟ ରଙ୍ଗ କ'ଣ?",a:["ନୀଳ","କଳା","ଗୋଲାପୀ","ସବୁଜ"],c:1},
+{q:"ତୁମେ ଖାଲି ସମୟରେ କ'ଣ କରିବାକୁ ଭଲ ପାଅ?",a:["ଗୀତ ଶୁଣିବା","ସିନେମା ଦେଖିବା","ଶୋଇବା","ବୁଲିବା"],c:0},
+{q:"ତୁମକୁ ସବୁଠାରୁ ଅଧିକ ଖୁସି କିଏ କରେ?",a:["ସାଙ୍ଗ","ପରିବାର","ପ୍ରିୟ ମଣିଷ","ନିଜେ"],c:2},
+{q:"ତୁମର ପ୍ରିୟ ଖାଦ୍ୟ କ'ଣ?",a:["ପିଜ୍ଜା","ବିରିୟାନି","ଦୋସା","ଆଇସକ୍ରିମ୍"],c:1},
+{q:"ତୁମେ ରାଗିଗଲେ କ'ଣ ପସନ୍ଦ କର?",a:["ଏକା ରହିବା","କଥା ହେବା","ହସିବା","ବୁଲିବା"],c:0},
+{q:"ତୁମର ସ୍ୱପ୍ନର ଭ୍ରମଣ ସ୍ଥାନ କେଉଁଟି?",a:["ସମୁଦ୍ର କୂଳ","ପାହାଡ଼","ବିଦେଶ","ଜଙ୍ଗଲ"],c:0},
+{q:"ତୁମେ କେଉଁ ଉପହାରକୁ ଅଧିକ ପସନ୍ଦ କର?",a:["ଚିଠି","ଫୁଲ","ଚକୋଲେଟ୍","ସରପ୍ରାଇଜ୍"],c:3},
+{q:"ତୁମ ପାଇଁ ସମ୍ପର୍କରେ ସବୁଠାରୁ ଜରୁରୀ କ'ଣ?",a:["ବିଶ୍ୱାସ","ଟଙ୍କା","ଦେଖାଣିଆ","ପ୍ରତିଯୋଗିତା"],c:0},
+{q:"ତୁମେ କେଉଁ ସମୟକୁ ଅଧିକ ପସନ୍ଦ କର?",a:["ସକାଳ","ଦିନ","ସନ୍ଧ୍ୟା","ରାତି"],c:3},
+{q:"ତୁମକୁ କିଏ ସବୁଠାରୁ ଅଧିକ ହସାଏ?",a:["ସାଙ୍ଗ","ଭାଇ/ଭଉଣୀ","ପ୍ରିୟ ମଣିଷ","ନିଜେ"],c:2},
+{q:"ତୁମର ପ୍ରିୟ ଋତୁ କେଉଁଟି?",a:["ଗ୍ରୀଷ୍ମ","ବର୍ଷା","ଶୀତ","ବସନ୍ତ"],c:2},
+{q:"ତୁମେ ଉପହାରରେ କ'ଣ ଅଧିକ ପସନ୍ଦ କର?",a:["ହାତରେ ତିଆରି ଜିନିଷ","ଦାମୀ ଜିନିଷ","ଚିଠି","ଯାତ୍ରା"],c:0},
+{q:"ତୁମେ ଦୁଃଖୀ ହେଲେ କ'ଣ ଚାହଁ?",a:["କେହି ଶୁଣନ୍ତୁ","ଏକା ରହିବା","ମଜା କଥା","ଶୋଇବା"],c:0},
+{q:"ତୁମ ପାଇଁ ପ୍ରେମର ଅର୍ଥ କ'ଣ?",a:["ବିଶ୍ୱାସ","କେବଳ ଉପହାର","ଦେଖାଣିଆ","ପ୍ରତିଯୋଗିତା"],c:0},
+{q:"ତୁମେ କେଉଁ ପାନୀୟ ପସନ୍ଦ କର?",a:["ଚା","କଫି","ଜୁସ୍","ପାଣି"],c:0},
+{q:"ତୁମେ ଛୁଟିଦିନରେ କ'ଣ କରିବାକୁ ଚାହଁ?",a:["ଘରେ ରହିବା","ବୁଲିବା","ସିନେମା","ସାଙ୍ଗଙ୍କ ସହ ସମୟ"],c:1},
+{q:"ତୁମର ସବୁଠାରୁ ବଡ଼ ଭୟ କ'ଣ?",a:["ହରାଇବା","ଅନ୍ଧାର","ଉଚ୍ଚତା","ଏକା ରହିବା"],c:0},
+{q:"ତୁମକୁ କେଉଁ ପ୍ରକାର ସନ୍ଦେଶ ଭଲ ଲାଗେ?",a:["ମଜାଳିଆ","ପ୍ରେମଭରା","ଲମ୍ବା","ଛୋଟ"],c:1},
+{q:"ତୁମେ କେଉଁ ପ୍ରକାର ସିନେମା ପସନ୍ଦ କର?",a:["କମେଡି","ରୋମାଣ୍ଟିକ୍","ହରର୍","ଆକ୍ସନ୍"],c:1},
+{q:"ତୁମେ କାହା ସହ ସମୟ ବିତାଇବାକୁ ଭଲ ପାଅ?",a:["ସାଙ୍ଗ","ପରିବାର","ପ୍ରିୟ ମଣିଷ","ଏକା"],c:2},
+{q:"ତୁମ ପାଇଁ ସବୁଠାରୁ ସୁନ୍ଦର ଜିନିଷ କ'ଣ?",a:["ପ୍ରକୃତି","ଟଙ୍କା","ପୋଷାକ","ଫୋନ୍"],c:0},
+{q:"ତୁମେ ଭୁଲ୍ କଲେ କ'ଣ ଆଶା କର?",a:["ବୁଝିବା","ଦଣ୍ଡ","ଅବହେଳା","ରାଗ"],c:0},
+{q:"ତୁମେ କେଉଁ ରଙ୍ଗର ପୋଷାକ ଅଧିକ ପିନ୍ଧ?",a:["କଳା","ଧଳା","ନୀଳ","ଯେକୌଣସି"],c:0},
+{q:"ତୁମର ସବୁଠାରୁ ପ୍ରିୟ ସ୍ମୃତି କେଉଁଟି?",a:["ପିଲାଦିନ","ସାଙ୍ଗଙ୍କ ସହ","ପରିବାର ସହ","ପ୍ରେମର ସ୍ମୃତି"],c:3},
+{q:"ତୁମେ କାହାକୁ କ୍ଷମା କରିବାକୁ କ'ଣ ଦରକାର ମନେ କର?",a:["ସତ୍ୟ କଥା","ଉପହାର","ସମୟ","କିଛି ନୁହେଁ"],c:0}
 ];
 
-let round=[],index=0,score=0,locked=false;
-
+let round=[],index=0,score=0,locked=false,currentName="Love Birds";
+function el(id){return document.getElementById(id)}
+function hideAll(){["home","game","result","leaderboard"].forEach(id=>el(id).style.display="none")}
+function goHome(){hideAll();el("home").style.display="block"}
 function startQuiz(){
+ currentName=el("coupleName").value.trim()||"Love Birds";
  round=[...questions].sort(()=>Math.random()-.5);
- index=0;score=0;
- document.getElementById('home').style.display='none';
- document.getElementById('result').style.display='none';
- document.getElementById('game').style.display='block';
- showQuestion();
+ index=0;score=0;hideAll();el("game").style.display="block";showQuestion()
 }
 function showQuestion(){
- locked=false;
- const item=round[index];
- document.getElementById('number').textContent=
-  `ପ୍ରଶ୍ନ ${index+1} / ${round.length}`;
- document.getElementById('bar').style.width=
-  `${index/round.length*100}%`;
- document.getElementById('question').textContent=item.q;
- document.getElementById('feedback').textContent='';
- document.getElementById('next').style.display='none';
- const box=document.getElementById('answers');
- box.innerHTML='';
+ locked=false;let item=round[index];
+ el("number").textContent=`ପ୍ରଶ୍ନ ${index+1} / ${round.length}`;
+ el("bar").style.width=`${index/round.length*100}%`;
+ el("question").textContent=item.q;el("feedback").textContent="";
+ el("next").style.display="none";el("next").textContent="ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜";
+ el("answers").innerHTML="";
  item.a.forEach((answer,i)=>{
-  const b=document.createElement('button');
-  b.className='answer';
-  b.textContent=answer;
-  b.onclick=()=>chooseAnswer(i,b);
-  box.appendChild(b);
- });
+  let b=document.createElement("button");b.className="answer";b.textContent=answer;
+  b.onclick=()=>chooseAnswer(i);el("answers").appendChild(b)
+ })
 }
-function chooseAnswer(choice,button){
- if(locked)return;
- locked=true;
- const item=round[index];
- document.querySelectorAll('.answer').forEach(b=>b.disabled=true);
- if(choice===item.c){
-  score++;
-  document.getElementById('feedback').textContent='ଠିକ୍ ଉତ୍ତର! 💖';
- }else{
-  document.getElementById('feedback').textContent=
-   'ଠିକ୍ ଉତ୍ତର: '+item.a[item.c];
- }
- document.getElementById('bar').style.width=
-  `${(index+1)/round.length*100}%`;
- document.getElementById('next').style.display='block';
- document.getElementById('next').textContent=
-  index===round.length-1?'See Result 💗':'Next Question ➜';
+function chooseAnswer(choice){
+ if(locked)return;locked=true;let item=round[index];
+ document.querySelectorAll(".answer").forEach(b=>b.disabled=true);
+ if(choice===item.c){score++;el("feedback").textContent="ଠିକ୍ ଉତ୍ତର! 💖"}
+ else{el("feedback").textContent="ଠିକ୍ ଉତ୍ତର: "+item.a[item.c]}
+ el("bar").style.width=`${(index+1)/round.length*100}%`;
+ el("next").style.display="block";
+ el("next").textContent=index===round.length-1?"ଫଳାଫଳ ଦେଖ 💗":"ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜"
 }
 function nextQuestion(){
- index++;
- if(index<round.length){showQuestion();return;}
- document.getElementById('game').style.display='none';
- document.getElementById('result').style.display='block';
- const percent=Math.round(score/round.length*100);
- document.getElementById('score').textContent=
-  `${score} / ${round.length} (${percent}%)`;
- document.getElementById('title').textContent=
-  percent>=80?'ତୁମେ ଜଣେ ସୁପରଷ୍ଟାର! 💖':
-  percent>=50?'ତୁମେ ଭଲ ଜାଣିଛ! 💕':
-  'ଆହୁରି ପରସ୍ପରକୁ ଜାଣିବାର ସମୟ! 💌';
+ index++;if(index<round.length){showQuestion();return}
+ hideAll();el("result").style.display="block";
+ let percent=Math.round(score/round.length*100);
+ el("finalScore").textContent=`${score} / ${round.length} (${percent}%)`;
+ el("finalTitle").textContent=percent>=80?"ତୁମେ ଜଣେ ସୁପରଷ୍ଟାର! 💖":percent>=50?"ତୁମେ ଭଲ ଜାଣିଛ! 💕":"ଆହୁରି ପରସ୍ପରକୁ ଜାଣିବାର ସମୟ! 💌"
+}
+function getScores(){try{return JSON.parse(localStorage.getItem("knowMeScores")||"[]")}catch(e){return []}}
+function saveScore(){
+ let scores=getScores();
+ scores.push({name:currentName,score:score,total:round.length,percent:Math.round(score/round.length*100),date:Date.now()});
+ scores.sort((a,b)=>b.percent-a.percent||b.score-a.score||a.date-b.date);
+ localStorage.setItem("knowMeScores",JSON.stringify(scores.slice(0,50)));
+ showBoard()
+}
+function showBoard(){
+ hideAll();el("leaderboard").style.display="block";
+ let scores=getScores().sort((a,b)=>b.percent-a.percent||b.score-a.score||a.date-b.date).slice(0,2);
+ el("boardRows").innerHTML="";
+ el("emptyBoard").style.display=scores.length?"none":"block";
+ scores.forEach((s,i)=>{
+  let row=document.createElement("div");row.className="rank";
+  let medal=document.createElement("span");medal.textContent=i===0?"🥇":"🥈";
+  let name=document.createElement("span");name.className="name";name.textContent=s.name;
+  let points=document.createElement("span");points.className="score";points.textContent=s.percent+"%";
+  row.append(medal,name,points);el("boardRows").appendChild(row)
+ })
 }
 </script>
 </body>
