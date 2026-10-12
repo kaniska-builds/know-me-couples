@@ -92,13 +92,8 @@ input{width:100%;padding:12px;border:1px solid #e8b8d0;border-radius:12px;margin
 </main>
 
 <script>
-/*
-  Supabase project settings:
-  URL and publishable key below are for your project.
-  Never put a sb_secret_ or service_role key in this file.
-*/
 const SUPABASE_URL = "https://susvamdefjbubpltxrzm.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Jjw14Tc2gvMPMICJzKz-QA_Y-UJD6p";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Jjw14Tc2gvMPMICJzKz-QA_YQ-UJD6p";
 const FUNCTION_URL = SUPABASE_URL + "/functions/v1/hyper-function";
 
 let round = [];
@@ -108,142 +103,123 @@ let sessionId = "";
 let currentName = "Love Birds";
 let locked = false;
 let submitting = false;
-let lastResult = null;
 
-function el(id) {
-  return document.getElementById(id);
-}
+function el(id){return document.getElementById(id)}
 
-function hideAll() {
-  ["home", "game", "result", "leaderboard"].forEach(id => {
-    el(id).style.display = "none";
+function hideAll(){
+  ["home","game","result","leaderboard"].forEach(id=>{
+    el(id).style.display="none";
   });
 }
 
-function goHome() {
+function goHome(){
   hideAll();
-  el("home").style.display = "block";
+  el("home").style.display="block";
 }
 
-async function api(action, extra = {}) {
-  const response = await fetch(FUNCTION_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "apikey": SUPABASE_PUBLISHABLE_KEY
+async function api(action,extra={}){
+  const response=await fetch(FUNCTION_URL,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "apikey":SUPABASE_PUBLISHABLE_KEY
     },
-    body: JSON.stringify({ action, ...extra })
+    body:JSON.stringify({action,...extra})
   });
 
-  const text = await response.text();
+  const text=await response.text();
   let data;
 
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new Error("ସର୍ଭରରୁ ଠିକ୍ ଉତ୍ତର ମିଳିଲା ନାହିଁ।");
+  try{
+    data=JSON.parse(text);
+  }catch{
+    throw new Error("ସର୍ଭରରୁ ଠିକ୍ ଉତ୍ତର ମିଳିଲା ନାହିଁ। HTTP "+response.status);
   }
 
-  if (!response.ok) {
-    throw new Error(data.error || data.message || "Request failed (" + response.status + ")");
+  if(!response.ok){
+    throw new Error(data.message||data.error||"Request failed ("+response.status+")");
   }
 
-  if (data.error) {
-    throw new Error(data.error);
-  }
-
+  if(data.error)throw new Error(data.error);
   return data;
 }
 
-function shuffleLocal(items) {
-  return [...items].sort(() => Math.random() - 0.5);
-}
+async function startQuiz(){
+  const btn=el("startBtn");
+  currentName=el("coupleName").value.trim()||"Love Birds";
 
-async function startQuiz() {
-  const btn = el("startBtn");
-  currentName = el("coupleName").value.trim() || "Love Birds";
+  btn.disabled=true;
+  btn.textContent="ଲୋଡ୍ ହେଉଛି... 💗";
+  el("homeStatus").textContent="ସର୍ଭରରୁ ପ୍ରଶ୍ନ ଆସୁଛି...";
 
-  if (currentName.length > 30) {
-    el("homeStatus").textContent = "ଦୟାକରି ୩୦ ଅକ୍ଷର ମଧ୍ୟରେ ନାମ ଲେଖ।";
-    return;
-  }
+  try{
+    const data=await api("start");
 
-  btn.disabled = true;
-  btn.textContent = "ଲୋଡ୍ ହେଉଛି... 💗";
-  el("homeStatus").textContent = "ସର୍ଭରରୁ ପ୍ରଶ୍ନ ଆସୁଛି...";
-
-  try {
-    const data = await api("start");
-
-    if (!data.session_id || !Array.isArray(data.questions) || data.questions.length === 0) {
-      throw new Error("ପ୍ରଶ୍ନ ମିଳିଲା ନାହିଁ। Supabase ରେ ପ୍ରଶ୍ନ ଯୋଡ଼।");
+    if(!data.session_id||!Array.isArray(data.questions)||!data.questions.length){
+      throw new Error("ପ୍ରଶ୍ନ ମିଳିଲା ନାହିଁ। Supabase ରେ ପ୍ରଶ୍ନ ଯାଞ୍ଚ କର।");
     }
 
-    sessionId = data.session_id;
-    round = data.questions;
-    answers = [];
-    index = 0;
-    locked = false;
-    submitting = false;
-    lastResult = null;
+    sessionId=data.session_id;
+    round=data.questions;
+    answers=[];
+    index=0;
+    locked=false;
+    submitting=false;
 
     hideAll();
-    el("game").style.display = "block";
+    el("game").style.display="block";
     showQuestion();
-  } catch (error) {
-    el("homeStatus").textContent =
-      "ତ୍ରୁଟି: " + error.message + " | ଇଣ୍ଟରନେଟ୍ ଓ Supabase function ଯାଞ୍ଚ କର।";
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "ଖେଳ ଆରମ୍ଭ 💖";
+  }catch(error){
+    el("homeStatus").textContent="ତ୍ରୁଟି: "+error.message;
+  }finally{
+    btn.disabled=false;
+    btn.textContent="ଖେଳ ଆରମ୍ଭ 💖";
   }
 }
 
-function showQuestion() {
-  locked = false;
-  const item = round[index];
+function showQuestion(){
+  locked=false;
+  const item=round[index];
 
-  el("number").textContent = `ପ୍ରଶ୍ନ ${index + 1} / ${round.length}`;
-  el("bar").style.width = `${index / round.length * 100}%`;
-  el("question").textContent = item.question;
-  el("feedback").textContent = "ଏକ ଉତ୍ତର ବାଛ।";
-  el("next").style.display = "none";
-  el("next").disabled = false;
-  el("answers").innerHTML = "";
+  el("number").textContent=`ପ୍ରଶ୍ନ ${index+1} / ${round.length}`;
+  el("bar").style.width=`${index/round.length*100}%`;
+  el("question").textContent=item.question;
+  el("feedback").textContent="ଏକ ଉତ୍ତର ବାଛ।";
+  el("next").style.display="none";
+  el("next").disabled=false;
+  el("answers").innerHTML="";
 
-  item.options.forEach((option, i) => {
-    const button = document.createElement("button");
-    button.className = "answer";
-    button.textContent = option;
-    button.onclick = () => chooseAnswer(i);
+  item.options.forEach((option,i)=>{
+    const button=document.createElement("button");
+    button.className="answer";
+    button.textContent=option;
+    button.onclick=()=>chooseAnswer(i);
     el("answers").appendChild(button);
   });
 }
 
-function chooseAnswer(choice) {
-  if (locked || submitting) return;
+function chooseAnswer(choice){
+  if(locked||submitting)return;
 
-  locked = true;
-  answers[index] = choice;
+  locked=true;
+  answers[index]=choice;
 
-  document.querySelectorAll(".answer").forEach((button, i) => {
-    button.disabled = true;
-    if (i === choice) button.classList.add("selected");
+  document.querySelectorAll(".answer").forEach((button,i)=>{
+    button.disabled=true;
+    if(i===choice)button.classList.add("selected");
   });
 
-  el("feedback").textContent = "ଉତ୍ତର ସେଭ୍ ହେଲା 💗";
-  el("bar").style.width = `${(index + 1) / round.length * 100}%`;
-  el("next").textContent =
-    index === round.length - 1 ? "ଫଳାଫଳ ଦେଖ 💗" : "ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜";
-  el("next").style.display = "block";
+  el("feedback").textContent="ଉତ୍ତର ସେଭ୍ ହେଲା 💗";
+  el("bar").style.width=`${(index+1)/round.length*100}%`;
+  el("next").textContent=index===round.length-1?"ଫଳାଫଳ ଦେଖ 💗":"ପରବର୍ତ୍ତୀ ପ୍ରଶ୍ନ ➜";
+  el("next").style.display="block";
 }
 
-async function nextQuestion() {
-  if (!locked || submitting) return;
+async function nextQuestion(){
+  if(!locked||submitting)return;
 
-  index++;
-
-  if (index < round.length) {
+  if(index<round.length-1){
+    index++;
     showQuestion();
     return;
   }
@@ -251,89 +227,82 @@ async function nextQuestion() {
   await submitScore();
 }
 
-async function submitScore() {
-  submitting = true;
-  el("next").disabled = true;
-  el("feedback").textContent = "ସର୍ଭରରେ ସ୍କୋର ଯାଞ୍ଚ ହେଉଛି... 💗";
+async function submitScore(){
+  submitting=true;
+  el("next").disabled=true;
+  el("feedback").textContent="ସର୍ଭରରେ ସ୍କୋର ଯାଞ୍ଚ ହେଉଛି... 💗";
 
-  try {
-    const data = await api("submit", {
-      session_id: sessionId,
-      couple_name: currentName,
+  try{
+    const data=await api("submit",{
+      session_id:sessionId,
+      couple_name:currentName,
       answers
     });
 
-    lastResult = data;
     hideAll();
-    el("result").style.display = "block";
+    el("result").style.display="block";
 
-    const score = Number(data.score);
-    const total = Number(data.total_questions);
-    const percent = Number(data.percentage);
+    const score=Number(data.score);
+    const total=Number(data.total_questions);
+    const percent=Number(data.percentage);
 
-    el("finalScore").textContent = `${score} / ${total} (${percent}%)`;
-    el("finalTitle").textContent =
-      percent >= 80 ? "ତୁମେ ଜଣେ ସୁପରଷ୍ଟାର! 💖" :
-      percent >= 50 ? "ତୁମେ ଭଲ ଜାଣିଛ! 💕" :
+    el("finalScore").textContent=`${score} / ${total} (${percent}%)`;
+    el("finalTitle").textContent=
+      percent>=80?"ତୁମେ ଜଣେ ସୁପରଷ୍ଟାର! 💖":
+      percent>=50?"ତୁମେ ଭଲ ଜାଣିଛ! 💕":
       "ଆହୁରି ପରସ୍ପରକୁ ଜାଣିବାର ସମୟ! 💌";
 
-    el("resultStatus").textContent =
-      "ସ୍କୋର ସର୍ଭରରେ ଯାଞ୍ଚ ହୋଇଛି। ଲିଡରବୋର୍ଡ ଦେଖିବା ପାଇଁ ତଳର ବଟନ୍ ଦବାଅ।";
-  } catch (error) {
-    el("feedback").textContent = "ସ୍କୋର ସେଭ୍ ହୋଇନାହିଁ: " + error.message;
-    el("next").disabled = false;
-    el("next").textContent = "ପୁଣି ଚେଷ୍ଟା କର";
-    index = round.length - 1;
-    submitting = false;
-    return;
+    el("resultStatus").textContent="ସ୍କୋର ସର୍ଭରରେ ଯାଞ୍ଚ ହୋଇଛି।";
+  }catch(error){
+    el("feedback").textContent="ସ୍କୋର ସେଭ୍ ହୋଇନାହିଁ: "+error.message;
+    el("next").disabled=false;
+    el("next").textContent="ପୁଣି ଚେଷ୍ଟା କର";
+  }finally{
+    submitting=false;
   }
-
-  submitting = false;
 }
 
-async function showBoard() {
+async function showBoard(){
   hideAll();
-  el("leaderboard").style.display = "block";
-  el("boardRows").innerHTML = "";
-  el("emptyBoard").style.display = "none";
-  el("boardStatus").textContent = "ଲିଡରବୋର୍ଡ ଲୋଡ୍ ହେଉଛି...";
+  el("leaderboard").style.display="block";
+  el("boardRows").innerHTML="";
+  el("emptyBoard").style.display="none";
+  el("boardStatus").textContent="ଲିଡରବୋର୍ଡ ଲୋଡ୍ ହେଉଛି...";
 
-  try {
-    const data = await api("leaderboard");
-    const rows = Array.isArray(data)
-      ? data
-      : (data.leaderboard || data.scores || data.data || []);
+  try{
+    const data=await api("leaderboard");
+    const rows=Array.isArray(data)?data:
+      (data.leaderboard||data.scores||data.data||[]);
 
-    if (!Array.isArray(rows) || rows.length === 0) {
-      el("boardStatus").textContent = "";
-      el("emptyBoard").style.display = "block";
+    if(!Array.isArray(rows)||!rows.length){
+      el("boardStatus").textContent="";
+      el("emptyBoard").style.display="block";
       return;
     }
 
-    el("boardStatus").textContent = "";
+    el("boardStatus").textContent="";
 
-    rows.slice(0, 2).forEach((item, i) => {
-      const row = document.createElement("div");
-      row.className = "rank";
+    rows.slice(0,2).forEach((item,i)=>{
+      const row=document.createElement("div");
+      row.className="rank";
 
-      const medal = document.createElement("span");
-      medal.textContent = i === 0 ? "🥇" : "🥈";
+      const medal=document.createElement("span");
+      medal.textContent=i===0?"🥇":"🥈";
 
-      const name = document.createElement("span");
-      name.className = "name";
-      name.textContent = item.couple_name || item.name || "Love Birds";
+      const name=document.createElement("span");
+      name.className="name";
+      name.textContent=item.couple_name||item.name||"Love Birds";
 
-      const points = document.createElement("span");
-      points.className = "score";
-      points.textContent = Number(item.percentage ?? item.percent ?? 0) + "%";
+      const points=document.createElement("span");
+      points.className="score";
+      points.textContent=Number(item.percentage??item.percent??0)+"%";
 
-      row.append(medal, name, points);
+      row.append(medal,name,points);
       el("boardRows").appendChild(row);
     });
-  } catch (error) {
-    el("boardStatus").textContent =
-      "ଲିଡରବୋର୍ଡ ଲୋଡ୍ ହୋଇନାହିଁ: " + error.message;
-    el("emptyBoard").style.display = "block";
+  }catch(error){
+    el("boardStatus").textContent="ଲିଡରବୋର୍ଡ ଲୋଡ୍ ହୋଇନାହିଁ: "+error.message;
+    el("emptyBoard").style.display="block";
   }
 }
 </script>
